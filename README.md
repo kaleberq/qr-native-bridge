@@ -48,9 +48,9 @@ final Uint8List pngBytes = await bridge.generateQr('https://meusite.com/abc');
 
 - `scanQr` e `generateQr` retornam `notImplemented` por enquanto. Você pode implementar no `QrNativeBridgePlugin.kt` ou tratar no app (ex.: esconder botões de QR no Android até haver implementação).
 
-## Usar no Jogo-da-velha (ou outro app)
+## Usar em seu app
 
-1. No projeto (ex.: Jogo-da-velha), adicione o pacote com `path` apontando para a pasta do `qr-native-bridge`.
+1. No projeto adicione o pacote com `path` apontando para a pasta do `qr-native-bridge`.
 2. Troque as chamadas que usam `NativeQrScannerChannel` / `NativeQrGeneratorChannel` por:
 
 ```dart
