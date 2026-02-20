@@ -61,14 +61,6 @@ final value = await bridge.scanQr();
 final bytes = await bridge.generateQr(data);
 ```
 
-## Exemplo
-
-O app em `example/` demonstra os três métodos. Rode no iOS:
-
-```bash
-cd example && flutter run
-```
-
 ## Estrutura do plugin
 
 - **Dart:** `lib/qr_native_bridge.dart` (API), `qr_native_bridge_platform_interface.dart`, `qr_native_bridge_method_channel.dart`.
