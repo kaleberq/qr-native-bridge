@@ -11,15 +11,12 @@ import CoreImage
 
 public class QrNativeBridgePlugin: NSObject, FlutterPlugin {
 
-    private var registrar: FlutterPluginRegistrar?
-
     public static func register(with registrar: FlutterPluginRegistrar) {
         let channel = FlutterMethodChannel(
             name: "qr_native_bridge",
             binaryMessenger: registrar.messenger()
         )
         let instance = QrNativeBridgePlugin()
-        instance.registrar = registrar
         channel.setMethodCallHandler(instance.handle)
     }
 
@@ -113,9 +110,7 @@ public class QrNativeBridgePlugin: NSObject, FlutterPlugin {
 
     private func presentQrScanner(result: @escaping FlutterResult) {
         let rootViewController: UIViewController?
-        if let vc = registrar?.value(forKey: "viewController") as? UIViewController {
-            rootViewController = vc
-        } else if let windowScene = UIApplication.shared.connectedScenes
+        if let windowScene = UIApplication.shared.connectedScenes
             .first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene,
             let window = windowScene.windows.first(where: { $0.isKeyWindow }) {
             rootViewController = window.rootViewController
