@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 import 'qr_native_bridge_method_channel.dart';
@@ -25,5 +27,16 @@ abstract class QrNativeBridgePlatform extends PlatformInterface {
 
   Future<String?> getPlatformVersion() {
     throw UnimplementedError('platformVersion() has not been implemented.');
+  }
+
+  /// Abre o scanner nativo de QR code e retorna o valor escaneado.
+  /// Retorna `null` se o usuário cancelar.
+  Future<String?> scanQr() {
+    throw UnimplementedError('scanQr() has not been implemented.');
+  }
+
+  /// Gera um QR code em PNG (bytes) a partir do texto [data].
+  Future<Uint8List> generateQr(String data) {
+    throw UnimplementedError('generateQr() has not been implemented.');
   }
 }
