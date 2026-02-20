@@ -61,17 +61,6 @@ final value = await bridge.scanQr();
 final bytes = await bridge.generateQr(data);
 ```
 
-3. No **Jogo-da-velha**, você pode remover do `AppDelegate.swift` os blocos dos channels `br.com.kalebemisael.jogodavelha/qr` e `br.com.kalebemisael.jogodavelha/qr_scanner` (e a lógica de `generateQrPng` e `presentQrScanner`), pois isso passa a ser responsabilidade do plugin.
-4. Mantenha no app apenas o que for específico do jogo (ex.: deeplink).
-
-## API
-
-| Método | Retorno | Descrição |
-|--------|---------|-----------|
-| `getPlatformVersion()` | `Future<String?>` | Versão da plataforma (ex.: "iOS 17.0"). |
-| `scanQr()` | `Future<String?>` | Abre o scanner nativo; retorna o valor ou `null` se cancelar. |
-| `generateQr(String data)` | `Future<Uint8List>` | Gera QR em PNG; lança exceção em erro. |
-
 ## Exemplo
 
 O app em `example/` demonstra os três métodos. Rode no iOS:
