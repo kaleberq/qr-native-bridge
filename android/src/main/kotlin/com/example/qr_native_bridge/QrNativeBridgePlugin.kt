@@ -146,7 +146,7 @@ class QrNativeBridgePlugin :
             val pending = pendingScanResult ?: return@addActivityResultListener true
             pendingScanResult = null
             if (resultCode == Activity.RESULT_OK) {
-                val value = data?.getStringExtra(EXTRA_QR_RESULT)
+                val value = data?.getStringExtra(EXTRA_QR_SCAN_RESULT)
                 if (value != null) {
                     pending.success(value)
                 } else {

@@ -23,7 +23,7 @@ import com.google.mlkit.vision.common.InputImage
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicBoolean
 
-const val EXTRA_QR_RESULT = "qr_result"
+const val EXTRA_QR_SCAN_RESULT = "qr_result"
 
 class QrScannerActivity : ComponentActivity() {
 
@@ -84,7 +84,7 @@ class QrScannerActivity : ComponentActivity() {
         runOnUiThread {
             if (isFinishing || isDestroyed) return@runOnUiThread
             vibrate()
-            val intent = Intent().putExtra(EXTRA_QR_RESULT, value)
+            val intent = Intent().putExtra(EXTRA_QR_SCAN_RESULT, value)
             setResult(RESULT_OK, intent)
             finish()
         }
