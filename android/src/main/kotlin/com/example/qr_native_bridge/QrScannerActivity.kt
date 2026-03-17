@@ -91,12 +91,16 @@ class QrScannerActivity : ComponentActivity() {
     }
 
     private fun vibrate() {
-        val vibrator = getSystemService(VIBRATOR_SERVICE) as? Vibrator ?: return
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            vibrator.vibrate(VibrationEffect.createOneShot(100, VibrationEffect.DEFAULT_AMPLITUDE))
-        } else {
-            @Suppress("DEPRECATION")
-            vibrator.vibrate(100)
+        try {
+            val vibrator = getSystemService(VIBRATOR_SERVICE) as? Vibrator ?: return
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                vibrator.vibrate(VibrationEffect.createOneShot(100, VibrationEffect.DEFAULT_AMPLITUDE))
+            } else {
+                @Suppress("DEPRECATION")
+                vibrator.vibrate(100)
+            }
+        } catch (_: SecurityException) {
+            // If host app doesn't declare VIBRATE permission, skip haptic feedback.
         }
     }
 
