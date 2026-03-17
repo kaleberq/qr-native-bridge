@@ -22,6 +22,7 @@ import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel
 import java.io.ByteArrayOutputStream
 
 private const val CAMERA_REQUEST_CODE = 3981
+private const val SCAN_REQUEST_CODE = 3982
 
 /** QrNativeBridgePlugin */
 class QrNativeBridgePlugin :
@@ -32,7 +33,6 @@ class QrNativeBridgePlugin :
     private lateinit var channel: MethodChannel
     private var activity: Activity? = null
     private var pendingScanResult: Result? = null
-    private var scannerLauncher: androidx.activity.result.ActivityResultLauncher<Intent>? = null
 
     override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
         channel = MethodChannel(flutterPluginBinding.binaryMessenger, "qr_native_bridge")
@@ -85,14 +85,14 @@ class QrNativeBridgePlugin :
     }
 
     private fun launchScanner(result: Result) {
-        val launcher = scannerLauncher
-        if (launcher == null) {
-            result.error("NO_ACTIVITY", "Scanner not ready", null)
+        val act = activity
+        if (act == null) {
+            result.error("NO_ACTIVITY", "Activity not available", null)
             return
         }
         pendingScanResult = result
-        val intent = Intent(activity, QrScannerActivity::class.java)
-        launcher.launch(intent)
+        val intent = Intent(act, QrScannerActivity::class.java)
+        act.startActivityForResult(intent, SCAN_REQUEST_CODE)
     }
 
     fun onRequestPermissionsResult(
@@ -141,26 +141,21 @@ class QrNativeBridgePlugin :
 
     override fun onAttachedToActivity(binding: ActivityPluginBinding) {
         activity = binding.activity
-        if (activity is androidx.activity.ComponentActivity) {
-            val componentActivity = activity as androidx.activity.ComponentActivity
-            scannerLauncher = componentActivity.activityResultRegistry.register(
-                "qr_scanner",
-                componentActivity,
-                androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult()
-            ) { activityResult ->
-                val pending = pendingScanResult ?: return@register
-                pendingScanResult = null
-                if (activityResult.resultCode == Activity.RESULT_OK) {
-                    val value = activityResult.data?.getStringExtra(EXTRA_QR_RESULT)
-                    if (value != null) {
-                        pending.success(value)
-                    } else {
-                        pending.error("USER_CANCELLED", "Usuário cancelou o escaneamento", null)
-                    }
+        binding.addActivityResultListener { requestCode, resultCode, data ->
+            if (requestCode != SCAN_REQUEST_CODE) return@addActivityResultListener false
+            val pending = pendingScanResult ?: return@addActivityResultListener true
+            pendingScanResult = null
+            if (resultCode == Activity.RESULT_OK) {
+                val value = data?.getStringExtra(EXTRA_QR_RESULT)
+                if (value != null) {
+                    pending.success(value)
                 } else {
                     pending.error("USER_CANCELLED", "Usuário cancelou o escaneamento", null)
                 }
+            } else {
+                pending.error("USER_CANCELLED", "Usuário cancelou o escaneamento", null)
             }
+            true
         }
         binding.addRequestPermissionsResultListener { requestCode, permissions, grantResults ->
             if (requestCode == CAMERA_REQUEST_CODE) {
@@ -173,7 +168,6 @@ class QrNativeBridgePlugin :
     }
 
     override fun onDetachedFromActivityForConfigChanges() {
-        scannerLauncher = null
         activity = null
     }
 
@@ -182,7 +176,6 @@ class QrNativeBridgePlugin :
     }
 
     override fun onDetachedFromActivity() {
-        scannerLauncher = null
         activity = null
     }
 }
