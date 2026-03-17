@@ -21,6 +21,7 @@ import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.common.InputImage
 import java.util.concurrent.Executors
+import java.util.concurrent.atomic.AtomicBoolean
 
 const val EXTRA_QR_RESULT = "qr_result"
 
@@ -28,7 +29,7 @@ class QrScannerActivity : ComponentActivity() {
 
     private val cameraExecutor = Executors.newSingleThreadExecutor()
     private var barcodeScanner: BarcodeScanner? = null
-    private var resultSent = false
+    private val resultSent = AtomicBoolean(false)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -79,12 +80,14 @@ class QrScannerActivity : ComponentActivity() {
     }
 
     private fun onQrScanned(value: String) {
-        if (resultSent) return
-        resultSent = true
-        vibrate()
-        val intent = Intent().putExtra(EXTRA_QR_RESULT, value)
-        setResult(RESULT_OK, intent)
-        finish()
+        if (!resultSent.compareAndSet(false, true)) return
+        runOnUiThread {
+            if (isFinishing || isDestroyed) return@runOnUiThread
+            vibrate()
+            val intent = Intent().putExtra(EXTRA_QR_RESULT, value)
+            setResult(RESULT_OK, intent)
+            finish()
+        }
     }
 
     private fun vibrate() {
