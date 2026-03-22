@@ -33,6 +33,8 @@ class QrNativeBridgePlugin :
     private lateinit var channel: MethodChannel
     private var activity: Activity? = null
     private var pendingScanResult: Result? = null
+    /** Evita registrar listeners duplicados ao rotacionar / reanexar a Activity. */
+    private var activityListenersRegistered = false
 
     override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
         channel = MethodChannel(flutterPluginBinding.binaryMessenger, "qr_native_bridge")
@@ -141,6 +143,10 @@ class QrNativeBridgePlugin :
 
     override fun onAttachedToActivity(binding: ActivityPluginBinding) {
         activity = binding.activity
+        if (activityListenersRegistered) {
+            return
+        }
+        activityListenersRegistered = true
         binding.addActivityResultListener { requestCode, resultCode, data ->
             if (requestCode != SCAN_REQUEST_CODE) return@addActivityResultListener false
             val pending = pendingScanResult ?: return@addActivityResultListener true
@@ -169,6 +175,7 @@ class QrNativeBridgePlugin :
 
     override fun onDetachedFromActivityForConfigChanges() {
         activity = null
+        activityListenersRegistered = false
     }
 
     override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
@@ -177,5 +184,6 @@ class QrNativeBridgePlugin :
 
     override fun onDetachedFromActivity() {
         activity = null
+        activityListenersRegistered = false
     }
 }
